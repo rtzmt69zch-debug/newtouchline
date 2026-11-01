@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {createManager,acceptOffer,transferCandidates} from '../src/engine.js';
+const manager=createManager('unknown','게겐프레싱');
+manager.leagueReform={manCityRelegated:true,season:1};
+manager.citySanctionMarketEnabled=true;
+const gm=acceptOffer(manager,manager.offers[0].id);
+const candidates=transferCandidates(gm);
+const stars=candidates.filter(p=>p.citySanctionPlayer);
+assert.equal(stars.length,5,'all five sanction players survive manager offer acceptance');
+assert.deepEqual(stars.map(p=>p.name),['엘링 홀란드','제레미 도쿠','엘리엇 앤더슨','요슈코 그바르디올','잔루이지 돈나룸마']);
+assert.deepEqual(stars.map(p=>p.shirtNumber),[9,11,5,24,1]);
+assert.deepEqual(candidates.slice(0,5).map(p=>p.name),stars.map(p=>p.name),'five special players are shown first in transfer market');
+assert.equal(transferCandidates({...gm,season:2}).filter(p=>p.citySanctionPlayer).length,0,'special players disappear after season one');
+assert.equal(transferCandidates({...gm,citySanctionMarketEnabled:false,leagueReform:null}).filter(p=>p.citySanctionPlayer).length,0,'no sanction means no special players');
+console.log('City sanction market regression test passed.');
